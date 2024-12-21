@@ -52,6 +52,9 @@ const getStockData = async (symbol, functionType = 'TIME_SERIES_DAILY') => {
 
       const data = response.data;
 
+      console.log('Full API Response Data:');
+      console.log(JSON.stringify(data, null, 2));
+
       // Check for API-specific error responses
       if (data.Note) {
         throw new Error(`API Rate Limit: ${data.Note}`);

@@ -15,31 +15,42 @@ const functionOptions = [
 const StockStats = ({ stockData, selectedFunction }) => {
     if (!stockData) return null;
 
-    // Different data handling based on the selected function
     let stats = {};
     let lastDate = null;
 
-    switch (selectedFunction) {
-        case 'TIME_SERIES_DAILY':
-            lastDate = stockData['Time Series (Daily)'] ? 
-                Object.keys(stockData['Time Series (Daily)'])[0] : null;
-            stats = lastDate ? stockData['Time Series (Daily)'][lastDate] : {};
-            break;
-        case 'TIME_SERIES_WEEKLY':
-            lastDate = stockData['Weekly Time Series'] ? 
-                Object.keys(stockData['Weekly Time Series'])[0] : null;
-            stats = lastDate ? stockData['Weekly Time Series'][lastDate] : {};
-            break;
-        case 'TIME_SERIES_MONTHLY':
-            lastDate = stockData['Monthly Time Series'] ? 
-                Object.keys(stockData['Monthly Time Series'])[0] : null;
-            stats = lastDate ? stockData['Monthly Time Series'][lastDate] : {};
-            break;
-        case 'GLOBAL_QUOTE':
-            stats = stockData['Global Quote'] || {};
-            break;
-        default:
-            break;
+    if (selectedFunction === 'GLOBAL_QUOTE') {
+        // Global Quote has different key format (02. open instead of 1. open)
+        const quote = stockData['Global Quote'];
+        if (quote) {
+            stats = {
+                '1. open': quote['02. open'],
+                '2. high': quote['03. high'],
+                '3. low': quote['04. low'],
+                '4. close': quote['05. price'],
+                '5. volume': quote['06. volume']
+            };
+        }
+    } else {
+        // Handle Time Series data formats
+        switch (selectedFunction) {
+            case 'TIME_SERIES_DAILY':
+                lastDate = stockData['Time Series (Daily)'] ? 
+                    Object.keys(stockData['Time Series (Daily)'])[0] : null;
+                stats = lastDate ? stockData['Time Series (Daily)'][lastDate] : {};
+                break;
+            case 'TIME_SERIES_WEEKLY':
+                lastDate = stockData['Weekly Time Series'] ? 
+                    Object.keys(stockData['Weekly Time Series'])[0] : null;
+                stats = lastDate ? stockData['Weekly Time Series'][lastDate] : {};
+                break;
+            case 'TIME_SERIES_MONTHLY':
+                lastDate = stockData['Monthly Time Series'] ? 
+                    Object.keys(stockData['Monthly Time Series'])[0] : null;
+                stats = lastDate ? stockData['Monthly Time Series'][lastDate] : {};
+                break;
+            default:
+                break;
+        }
     }
 
     return (
@@ -78,9 +89,15 @@ const StockStats = ({ stockData, selectedFunction }) => {
 const StockName = ({ stockData }) => {
     if (!stockData) return null;
 
-    const symbol = stockData['Global Quote'] ? 
-        stockData['Global Quote']['01. symbol'] : 
-        stockData.symbol || 'N/A';
+    let symbol = 'N/A';
+    
+    // Check different data structures based on the response
+    if (stockData['Global Quote']) {
+        symbol = stockData['Global Quote']['01. symbol'];
+    } else if (stockData['Meta Data']) {
+        // All time series responses (daily, weekly, monthly) include Meta Data
+        symbol = stockData['Meta Data']['2. Symbol'];
+    }
 
     return (
         <div className={style.stockNameBlock}>
