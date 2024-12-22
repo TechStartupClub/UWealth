@@ -5,79 +5,94 @@ import style from './style/stock.module.css';
 import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
 
-const functionOptions = [
-    { value: 'TIME_SERIES_DAILY', label: 'Daily Time Series' },
-    { value: 'TIME_SERIES_WEEKLY', label: 'Weekly Time Series' },
-    { value: 'TIME_SERIES_MONTHLY', label: 'Monthly Time Series' },
-    { value: 'GLOBAL_QUOTE', label: 'Global Quote' }
-];
-
 const StockStats = ({ stockData, selectedFunction }) => {
     if (!stockData) return null;
 
-    let stats = {};
-    let lastDate = null;
-
     if (selectedFunction === 'GLOBAL_QUOTE') {
-        // Global Quote has different key format (02. open instead of 1. open)
         const quote = stockData['Global Quote'];
         if (quote) {
-            stats = {
-                '1. open': quote['02. open'],
-                '2. high': quote['03. high'],
-                '3. low': quote['04. low'],
-                '4. close': quote['05. price'],
-                '5. volume': quote['06. volume']
+            // Split the data into two columns
+            const leftColumnStats = {
+                'Symbol': quote['01. symbol'],
+                'Open': `$${parseFloat(quote['02. open']).toFixed(2)}`,
+                'High': `$${parseFloat(quote['03. high']).toFixed(2)}`,
+                'Low': `$${parseFloat(quote['04. low']).toFixed(2)}`,
+                'Price': `$${parseFloat(quote['05. price']).toFixed(2)}`
             };
+
+            const rightColumnStats = {
+                'Volume': parseInt(quote['06. volume']).toLocaleString(),
+                'Latest Trading Day': quote['07. latest trading day'],
+                'Previous Close': `$${parseFloat(quote['08. previous close']).toFixed(2)}`,
+                'Change': `$${parseFloat(quote['09. change']).toFixed(2)}`,
+                'Change Percent': parseFloat(quote['10. change percent'].replace('%', '')).toFixed(2) + '%'
+            };
+
+            return (
+                <div className={style.stockStatsBox}>
+                    <div className={style.globalQuoteColumns}>
+                        <div className={style.column}>
+                            <table>
+                                <tbody>
+                                    {Object.entries(leftColumnStats).map(([label, value]) => (
+                                        <tr key={label}>
+                                            <td>{label}</td>
+                                            <td>{value || 'N/A'}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div className={style.column}>
+                            <table>
+                                <tbody>
+                                    {Object.entries(rightColumnStats).map(([label, value]) => (
+                                        <tr key={label}>
+                                            <td>{label}</td>
+                                            <td>{value || 'N/A'}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            );
         }
-    } else {
-        // Handle Time Series data formats
-        switch (selectedFunction) {
-            case 'TIME_SERIES_DAILY':
-                lastDate = stockData['Time Series (Daily)'] ? 
-                    Object.keys(stockData['Time Series (Daily)'])[0] : null;
-                stats = lastDate ? stockData['Time Series (Daily)'][lastDate] : {};
-                break;
-            case 'TIME_SERIES_WEEKLY':
-                lastDate = stockData['Weekly Time Series'] ? 
-                    Object.keys(stockData['Weekly Time Series'])[0] : null;
-                stats = lastDate ? stockData['Weekly Time Series'][lastDate] : {};
-                break;
-            case 'TIME_SERIES_MONTHLY':
-                lastDate = stockData['Monthly Time Series'] ? 
-                    Object.keys(stockData['Monthly Time Series'])[0] : null;
-                stats = lastDate ? stockData['Monthly Time Series'][lastDate] : {};
-                break;
-            default:
-                break;
-        }
-    }
+        return null;
+    } 
+    
+    // Handle time series data
+    const timeSeriesKey = {
+        'TIME_SERIES_DAILY': 'Time Series (Daily)',
+        'TIME_SERIES_WEEKLY': 'Weekly Time Series',
+        'TIME_SERIES_MONTHLY': 'Monthly Time Series'
+    }[selectedFunction];
+
+    const timeSeriesData = stockData[timeSeriesKey];
+    if (!timeSeriesData) return null;
+
+    const latestDate = Object.keys(timeSeriesData)[0];
+    const rawStats = timeSeriesData[latestDate];
+    const stats = {
+        'Open': `$${parseFloat(rawStats['1. open']).toFixed(2)}`,
+        'High': `$${parseFloat(rawStats['2. high']).toFixed(2)}`,
+        'Low': `$${parseFloat(rawStats['3. low']).toFixed(2)}`,
+        'Close': `$${parseFloat(rawStats['4. close']).toFixed(2)}`,
+        'Volume': parseInt(rawStats['5. volume']).toLocaleString()
+    };
 
     return (
         <div className={style.stockStatsBox}>
             <div>
                 <table>
                     <tbody>
-                        <tr>
-                            <td>Open</td>
-                            <td>{stats['1. open'] || 'N/A'}</td>
-                        </tr>
-                        <tr>
-                            <td>High</td>
-                            <td>{stats['2. high'] || 'N/A'}</td>
-                        </tr>
-                        <tr>
-                            <td>Low</td>
-                            <td>{stats['3. low'] || 'N/A'}</td>
-                        </tr>
-                        <tr>
-                            <td>Close</td>
-                            <td>{stats['4. close'] || 'N/A'}</td>
-                        </tr>
-                        <tr>
-                            <td>Volume</td>
-                            <td>{stats['5. volume'] || 'N/A'}</td>
-                        </tr>
+                        {Object.entries(stats).map(([label, value]) => (
+                            <tr key={label}>
+                                <td>{label}</td>
+                                <td>{value || 'N/A'}</td>
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
             </div>
@@ -85,17 +100,14 @@ const StockStats = ({ stockData, selectedFunction }) => {
     );
 };
 
-// StockName Component to display company name and symbol
 const StockName = ({ stockData }) => {
     if (!stockData) return null;
 
     let symbol = 'N/A';
     
-    // Check different data structures based on the response
     if (stockData['Global Quote']) {
         symbol = stockData['Global Quote']['01. symbol'];
     } else if (stockData['Meta Data']) {
-        // All time series responses (daily, weekly, monthly) include Meta Data
         symbol = stockData['Meta Data']['2. Symbol'];
     }
 
@@ -109,7 +121,6 @@ const StockName = ({ stockData }) => {
     );
 };
 
-// StockPriceSummary Component to display stock price and change
 const StockPriceSummary = ({ stockData }) => {
     if (!stockData) return null;
 
@@ -118,9 +129,9 @@ const StockPriceSummary = ({ stockData }) => {
     let changePercent = '0%';
 
     if (stockData['Global Quote']) {
-        price = stockData['Global Quote']['05. price'];
-        change = stockData['Global Quote']['09. change'];
-        changePercent = stockData['Global Quote']['10. change percent'];
+        price = parseFloat(stockData['Global Quote']['05. price']).toFixed(2);
+        change = parseFloat(stockData['Global Quote']['09. change']).toFixed(2);
+        changePercent = parseFloat(stockData['Global Quote']['10. change percent'].replace('%', '')).toFixed(2) + '%';
     } else {
         const timeSeriesData = stockData['Time Series (Daily)'] || 
                              stockData['Weekly Time Series'] || 
@@ -129,7 +140,6 @@ const StockPriceSummary = ({ stockData }) => {
             const latestDate = Object.keys(timeSeriesData)[0];
             const latestData = timeSeriesData[latestDate];
             price = latestData['4. close'];
-            // Calculate change and percent for time series data
             const prevDate = Object.keys(timeSeriesData)[1];
             if (prevDate) {
                 const prevData = timeSeriesData[prevDate];
@@ -145,7 +155,9 @@ const StockPriceSummary = ({ stockData }) => {
         <div className={style.stockPriceSummaryBox}>
             <div>{new Date().toLocaleDateString()}</div>
             <div className={style.stockSummaryWrap}>
-                <div className={style.stockSummaryHead}>{price}</div>
+                <div className={style.stockSummaryHead}>
+                    ${parseFloat(price).toFixed(2)}
+                </div>
                 <div className={style.stockSummaryChange} 
                      style={{ color: isPositiveChange ? 'green' : 'red' }}>
                     <i className={`fa-solid fa-caret-${isPositiveChange ? 'up' : 'down'}`} />
@@ -233,19 +245,44 @@ const Stock = () => {
             <NavBar />
             <div className={style.stockMainWrap}>
                 <div className={style.stockMainContent}>
-                    <div className={style.functionSelector}>
-                        <select 
-                            value={selectedFunction}
-                            onChange={(e) => handleFunctionChange(e.target.value)}
-                            className={style.functionSelect}
-                            disabled={isLoading}
-                        >
-                            {functionOptions.map(option => (
-                                <option key={option.value} value={option.value}>
-                                    {option.label}
-                                </option>
-                            ))}
-                        </select>
+                    <div className={style.headerSection}>
+                        {!isLoading && !error && <StockName stockData={stockData} />}
+                    </div>
+                    
+                    <div className={style.functionBar}>
+                        <div className={style.functionButtons}>
+                            <button 
+                                className={`${style.functionButton} ${selectedFunction === 'TIME_SERIES_DAILY' ? style.active : ''}`}
+                                onClick={() => handleFunctionChange('TIME_SERIES_DAILY')}
+                                disabled={isLoading}
+                            >
+                                Daily
+                            </button>
+                            <button 
+                                className={`${style.functionButton} ${selectedFunction === 'TIME_SERIES_WEEKLY' ? style.active : ''}`}
+                                onClick={() => handleFunctionChange('TIME_SERIES_WEEKLY')}
+                                disabled={isLoading}
+                            >
+                                Weekly
+                            </button>
+                            <button 
+                                className={`${style.functionButton} ${selectedFunction === 'TIME_SERIES_MONTHLY' ? style.active : ''}`}
+                                onClick={() => handleFunctionChange('TIME_SERIES_MONTHLY')}
+                                disabled={isLoading}
+                            >
+                                Monthly
+                            </button>
+                            <button 
+                                className={`${style.functionButton} ${selectedFunction === 'GLOBAL_QUOTE' ? style.active : ''}`}
+                                onClick={() => handleFunctionChange('GLOBAL_QUOTE')}
+                                disabled={isLoading}
+                            >
+                                Quote
+                            </button>
+                        </div>
+                        <button className={style.settingsButton} disabled={isLoading}>
+                            <i className="fas fa-cog"></i>
+                        </button>
                     </div>
 
                     {isLoading && (
@@ -268,14 +305,10 @@ const Stock = () => {
 
                     {!isLoading && !error && (
                         <>
-                            <StockName stockData={stockData} />
                             <StockPriceSummary stockData={stockData} />
-                            <div>
-                                Placeholder for graph.
-                            </div>
                             <StockStats stockData={stockData} selectedFunction={selectedFunction} />
                             <div>
-                                Latest news on Company Name [Placeholder]
+                                Latest news on StockName [Placeholder]
                             </div>
                         </>
                     )}
@@ -286,5 +319,4 @@ const Stock = () => {
     );
 };
 
-// StockStats component remains the same as before
 export default Stock;

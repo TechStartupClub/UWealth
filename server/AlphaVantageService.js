@@ -9,7 +9,6 @@ const CONFIG = {
   retryDelay: 1000, // 1 second between retries
 };
 
-// Validate API key on startup
 const API_KEY = process.env.ALPHA_VANTAGE_API_KEY;
 if (!API_KEY) {
   throw new Error('API Key is missing. Please set ALPHA_VANTAGE_API_KEY in your .env file');
