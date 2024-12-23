@@ -181,7 +181,7 @@ const Watchlist = () => {
      * @param {*} id Request identifier used to find and delete the stock from the list.
      */
     const deleteListing = (id) => {
-        const symb = (stockList.filter(listing => listing.id == id))[0].symbol;
+        const symb = (stockList.filter(listing => listing.id === id))[0].symbol;
         
         const deleteSymb = async () => {
             try {
@@ -223,7 +223,7 @@ const Watchlist = () => {
      */
     const checkIfStockExists = (symb) => {
         for (let i = 0; i < stockList.length; i++) {
-            if (stockList[i].symbol == symb) {
+            if (stockList[i].symbol === symb) {
                 return true;
             }
         }
