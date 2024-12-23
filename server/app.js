@@ -61,7 +61,7 @@ app.get('/contact', (req, res) => {
 app.use('/auth', authRoutes);
 
 /** Watchlist routes */
-app.use('/stock', stockRoutes);
+app.use('/watchlist', stockRoutes);
 
 /** Contact form submission */
 app.post('/contact', (req, res) => {
