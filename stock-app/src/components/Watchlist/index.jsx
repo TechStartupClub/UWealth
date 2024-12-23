@@ -54,16 +54,17 @@ const Watchlist = () => {
      * 
      * @param {*} symb Stock symbol to look up
      */
-    /*
+    
     const fetchStockData = (symb) => {
         // random number generation for ID
         const randomNum = getRandomNum();
         const theId = symb + randomNum;
+        const timeSeriesFcn = "GLOBAL_QUOTE";
 
         return new Promise(async (resolve) => {
             try {
                 console.log("Fetching data...");
-                const response = await axios.get(`stock/${symb}`);
+                const response = await axios.get(`stock/${symb}`, {params: {function: timeSeriesFcn}});
                 // functional update
                 setStockList(prevState => {
                     let objInsert = [...prevState,
@@ -73,7 +74,7 @@ const Watchlist = () => {
                             "data": response.data
                         }
                     ];
-                    console.log(objInsert);
+
                     return objInsert;
                 });
 
@@ -105,9 +106,10 @@ const Watchlist = () => {
                 }
             }
         });
-    }*/
+    }
     
     // TEMPORARY GET STOCK DATA HELPER FUNCTION
+    /*
     const fetchStockData = (symb) => {
         // random number generation for ID
         const randomNum = getRandomNum();
@@ -139,7 +141,7 @@ const Watchlist = () => {
                 })
             }
         });
-    }
+    }*/
 
     /**
      * Load the user's initial list of saved watchlist stocks
@@ -267,10 +269,10 @@ const Watchlist = () => {
                                             <div>
                                                 <span>{listing["data"]["Global Quote"]["05. price"]}</span>
                                                 <br />
-                                                <span className={parseInt(listing["data"]["Global Quote"]['09. change']) >= 0 ? style.stockGreen : style.stockRed}>
-                                                    {parseInt(listing["data"]["Global Quote"]['09. change']) >= 0 ? '+' : ''}
+                                                <span className={parseFloat(listing["data"]["Global Quote"]['09. change']) >= 0 ? style.stockGreen : style.stockRed}>
+                                                    {parseFloat(listing["data"]["Global Quote"]['09. change']) >= 0 ? '+' : ''}
                                                     {listing["data"]["Global Quote"]['09. change']}
-                                                    &nbsp;({parseInt(listing["data"]["Global Quote"]['09. change']) >= 0 ? '+' : ''}{listing["data"]["Global Quote"]['10. change percent']})
+                                                    &nbsp;({parseFloat(listing["data"]["Global Quote"]['09. change']) >= 0 ? '+' : ''}{listing["data"]["Global Quote"]['10. change percent']})
                                                 </span>
                                             </div>
 
@@ -334,6 +336,7 @@ const Watchlist = () => {
 }
 
 // ***TEMPORARY JSON "SERVER"***
+/*
 const TemporaryServ = (symbol) => {
     const quotes = {
         "IBM": {
@@ -373,6 +376,7 @@ const TemporaryServ = (symbol) => {
     
     return quotes[symbol];
 }
+*/
 // ***END OF TEMPORARY FUNCTION***
 
 
