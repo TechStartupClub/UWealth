@@ -5,9 +5,9 @@ import style from './style/stock.module.css';
 import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
 
-const StockStats = ({ stockData, selectedFunction }) => {
+const StockStats = ({ stockData, selectedFunction, showFullData }) => {
     if (!stockData) return null;
-
+ 
     if (selectedFunction === 'GLOBAL_QUOTE') {
         const quote = stockData['Global Quote'];
         if (quote) {
@@ -19,7 +19,7 @@ const StockStats = ({ stockData, selectedFunction }) => {
                 'Low': `$${parseFloat(quote['04. low']).toFixed(2)}`,
                 'Price': `$${parseFloat(quote['05. price']).toFixed(2)}`
             };
-
+ 
             const rightColumnStats = {
                 'Volume': parseInt(quote['06. volume']).toLocaleString(),
                 'Latest Trading Day': quote['07. latest trading day'],
@@ -27,7 +27,7 @@ const StockStats = ({ stockData, selectedFunction }) => {
                 'Change': `$${parseFloat(quote['09. change']).toFixed(2)}`,
                 'Change Percent': parseFloat(quote['10. change percent'].replace('%', '')).toFixed(2) + '%'
             };
-
+ 
             return (
                 <div className={style.stockStatsBox}>
                     <div className={style.globalQuoteColumns}>
@@ -68,10 +68,45 @@ const StockStats = ({ stockData, selectedFunction }) => {
         'TIME_SERIES_WEEKLY': 'Weekly Time Series',
         'TIME_SERIES_MONTHLY': 'Monthly Time Series'
     }[selectedFunction];
-
+ 
     const timeSeriesData = stockData[timeSeriesKey];
     if (!timeSeriesData) return null;
-
+ 
+    if (showFullData) {
+        // Show all dates
+        return (
+            <div className={style.stockStatsBox}>
+                <div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Open</th>
+                                <th>High</th>
+                                <th>Low</th>
+                                <th>Close</th>
+                                <th>Volume</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {Object.entries(timeSeriesData).map(([date, data]) => (
+                                <tr key={date}>
+                                    <td>{date}</td>
+                                    <td>${parseFloat(data['1. open']).toFixed(2)}</td>
+                                    <td>${parseFloat(data['2. high']).toFixed(2)}</td>
+                                    <td>${parseFloat(data['3. low']).toFixed(2)}</td>
+                                    <td>${parseFloat(data['4. close']).toFixed(2)}</td>
+                                    <td>{parseInt(data['5. volume']).toLocaleString()}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        );
+    }
+ 
+    // Show only latest date
     const latestDate = Object.keys(timeSeriesData)[0];
     const rawStats = timeSeriesData[latestDate];
     const stats = {
@@ -81,7 +116,7 @@ const StockStats = ({ stockData, selectedFunction }) => {
         'Close': `$${parseFloat(rawStats['4. close']).toFixed(2)}`,
         'Volume': parseInt(rawStats['5. volume']).toLocaleString()
     };
-
+ 
     return (
         <div className={style.stockStatsBox}>
             <div>
@@ -98,7 +133,7 @@ const StockStats = ({ stockData, selectedFunction }) => {
             </div>
         </div>
     );
-};
+ };
 
 const StockName = ({ stockData }) => {
     if (!stockData) return null;
@@ -176,6 +211,8 @@ const Stock = () => {
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [retryCount, setRetryCount] = useState(0);
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const [showFullData, setShowFullData] = useState(false);
     
     const [selectedFunction, setSelectedFunction] = useState(
         searchParams.get('function') || 'TIME_SERIES_DAILY'
@@ -236,6 +273,18 @@ const Stock = () => {
         }
     }, [symbol, selectedFunction, retryCount]);
 
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (isSettingsOpen && !event.target.closest(`.${style.settingsContainer}`)) {
+                setIsSettingsOpen(false);
+            }
+        };
+
+        document.addEventListener('click', handleClickOutside);
+        return () => document.removeEventListener('click', handleClickOutside);
+    }, [isSettingsOpen]);
+
     const handleRetry = () => {
         setRetryCount(prev => prev + 1);
     };
@@ -280,17 +329,38 @@ const Stock = () => {
                                 Quote
                             </button>
                         </div>
-                        <button className={style.settingsButton} disabled={isLoading}>
-                            <i className="fas fa-cog"></i>
-                        </button>
+                        <div className={style.settingsContainer}>
+                            <button 
+                                className={`${style.settingsButton} ${isSettingsOpen ? style.active : ''}`}
+                                onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+                                disabled={isLoading}
+                            >
+                                <i className="fas fa-cog"></i>
+                            </button>
+                            {isSettingsOpen && (
+                                <div className={style.settingsDropdown}>
+                                    <div className={style.settingsOption}>
+                                        <span>Full History</span>
+                                        <label className={style.switch}>
+                                            <input 
+                                                type="checkbox"
+                                                checked={showFullData}
+                                                onChange={() => setShowFullData(!showFullData)}
+                                            />
+                                            <span className={style.slider}></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
-
+    
                     {isLoading && (
                         <div className={style.loadingIndicator}>
                             Loading stock data...
                         </div>
                     )}
-
+    
                     {error && (
                         <div className={style.error}>
                             {error}
@@ -302,13 +372,17 @@ const Stock = () => {
                             </button>
                         </div>
                     )}
-
+    
                     {!isLoading && !error && (
                         <>
                             <StockPriceSummary stockData={stockData} />
-                            <StockStats stockData={stockData} selectedFunction={selectedFunction} />
+                            <StockStats 
+                                stockData={stockData} 
+                                selectedFunction={selectedFunction} 
+                                showFullData={showFullData}
+                            />                            
                             <div>
-                                Latest news on StockName [Placeholder]
+                                Latest news on Company Name [Placeholder]
                             </div>
                         </>
                     )}
