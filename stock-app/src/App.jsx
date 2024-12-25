@@ -12,17 +12,19 @@ import AllStocks from './routes/AllStocks';
 import StockGraph from './routes/StockGraph';
 import Search from './routes/Search';
 import Accessibility from './routes/Accessibility';
+import PrivacyPolicy from './routes/PrivacyPolicy';
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/about" element={<About />} />
-      <Route path="/t&c" element={<TermsAndConds />} />
+      <Route path="/termsAndConditions" element={<TermsAndConds />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
       <Route path="/accessibility" element={<Accessibility />} />
+      <Route path="privacyPolicy" element={<PrivacyPolicy />} />
       <Route element={<ProtectedRoutes />}> {/* Anything within this tag is protected */}
         <Route path="/profile/:userId" element={<UserProfile />} />
         <Route path="/stocks" element={<AllStocks />} />

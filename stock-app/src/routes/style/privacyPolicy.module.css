@@ -1,4 +1,4 @@
-.termsAndConditionSection h1 {
+.privacyPolicySection h1 {
     font-size: 2.5rem;
     margin-bottom: 20px;
     color: #333;
@@ -18,34 +18,26 @@
         transform: translateX(0); /* End position */
     }
 }
-.termsAndConditionSection {
+.privacyPolicySection {
     text-align: center;
     padding: 40px;
     background-color: #f9f9f9;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
-.termsAndConditionSection p {
+.privacyPolicySection p {
     font-size: 1.2rem;
     line-height: 1.6;
     color: #555;
 }
 
-.welcome p{
+.mayCollectSection p{
     color: #555;
-    padding-left: 400px;
-    padding-right: 400px;
+    text-align: left;
+    padding: 40px;
     background-color: #f9f9f9;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-.please p {
-    color: black;
-    padding-left: 400px;
-    padding-right: 400px;
-    padding-top: 45px;
-    font-weight: bold;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    
+
 }

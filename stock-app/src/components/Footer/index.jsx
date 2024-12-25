@@ -9,9 +9,9 @@ const Footer = () => {
         <footer className={style.footer}>
             <div className={style.footerContainer}>
                 <div class={style.footerLinks}>
-                    <Link to={'/privacy-policy'}>Privacy Policy</Link>
+                    <Link to={'/privacypolicy'}>Privacy Policy</Link>
                     <Link to={'/accessibility'}>Accessibility</Link>
-                    <Link to={'/t&c'}>Terms & Conditions</Link>
+                    <Link to={'/termsAndConditions'}>Terms & Conditions</Link>
                     <Link to={'/about'}>About</Link>
                     <Link to={'/contact'}>Contact</Link>
                 </div>
