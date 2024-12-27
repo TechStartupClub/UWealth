@@ -41,8 +41,28 @@ app.get('/stock/:symbol', async (req, res) => {
 
   try {
     console.log(`Processing request for ${symbol} with function type ${functionType}`);
-    const stockData = await fetchStockData(symbol, functionType);
-    res.json(stockData);
+    
+    // Fetch both overview and requested data concurrently
+    try {
+      const [overviewData, marketData] = await Promise.all([
+        fetchStockData(symbol, 'OVERVIEW'),  // Always fetch overview
+        fetchStockData(symbol, functionType) // Fetch requested market data
+      ]);
+
+      console.log('Overview data received:', !!overviewData);
+      console.log('Market data received:', !!marketData);
+
+      // Combine the data into a single response
+      const combinedData = {
+        overview: overviewData,
+        market_data: marketData
+      };
+
+      res.json(combinedData);
+    } catch (error) {
+      console.error('Error in Promise.all:', error);
+      throw error;
+    }
   } catch (error) {
     console.error('Error in stock route:', error);
     

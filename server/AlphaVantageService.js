@@ -51,8 +51,7 @@ const getStockData = async (symbol, functionType = 'TIME_SERIES_DAILY') => {
 
       const data = response.data;
 
-      console.log('Full API Response Data:');
-      console.log(JSON.stringify(data, null, 2));
+      console.log('Full API Response Data:', data);
 
       // Check for API-specific error responses
       if (data.Note) {
@@ -63,9 +62,20 @@ const getStockData = async (symbol, functionType = 'TIME_SERIES_DAILY') => {
         throw new Error(`API Error: ${data['Error Message']}`);
       }
 
-      // Validate response data structure
+      // Special handling for OVERVIEW function
+      if (functionType === 'OVERVIEW') {
+        if (!data.Symbol) {
+          console.error('Overview data missing Symbol:', data);
+          throw new Error('Invalid overview data received');
+        }
+        return data;
+      }
+
+      // For other function types, validate the time series key
       const timeSeriesKey = getTimeSeriesKey(functionType);
-      if (!data[timeSeriesKey]) {
+      if (timeSeriesKey && !data[timeSeriesKey]) {
+        console.error('Expected data key missing:', timeSeriesKey);
+        console.error('Received data:', data);
         throw new Error(`No ${timeSeriesKey} data found in response`);
       }
 
@@ -76,24 +86,23 @@ const getStockData = async (symbol, functionType = 'TIME_SERIES_DAILY') => {
       console.error(`Attempt ${attempt} failed:`, error.message);
 
       // Don't retry on certain errors
-      if (error.response?.status === 401) { // Invalid API key
+      if (error.response?.status === 401) {
         throw new Error('Invalid API key');
       }
 
-      if (error.response?.status === 422) { // Invalid parameters
+      if (error.response?.status === 422) {
         throw new Error('Invalid request parameters');
       }
 
       // If we haven't exceeded retry attempts, wait before trying again
       if (attempt < CONFIG.maxRetries) {
-        const waitTime = CONFIG.retryDelay * attempt; // Exponential backoff
+        const waitTime = CONFIG.retryDelay * attempt;
         console.log(`Waiting ${waitTime}ms before retry...`);
         await delay(waitTime);
       }
     }
   }
 
-  // If we've exhausted all retries, throw the last error
   throw new Error(`Failed after ${CONFIG.maxRetries} attempts. Last error: ${lastError.message}`);
 };
 
