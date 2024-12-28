@@ -10,6 +10,7 @@ const PriceChart = ({ marketData, selectedFunction }) => {
     if (!marketData) return null;
 
     const timeSeriesKey = {
+        'TIME_SERIES_INTRADAY': 'Time Series (5min)',
         'TIME_SERIES_DAILY': 'Time Series (Daily)',
         'TIME_SERIES_WEEKLY': 'Weekly Time Series',
         'TIME_SERIES_MONTHLY': 'Monthly Time Series'
@@ -18,24 +19,43 @@ const PriceChart = ({ marketData, selectedFunction }) => {
     const timeSeriesData = marketData[timeSeriesKey];
     if (!timeSeriesData) return null;
 
-    // Get current price (first entry in original data since it's most recent)
+    // Get current price for percentage calculations
     const currentPrice = parseFloat(Object.values(timeSeriesData)[0]['4. close']);
+
+    const formatDateTime = (dateTimeString) => {
+        if (selectedFunction === 'TIME_SERIES_INTRADAY') {
+            const date = new Date(dateTimeString);
+            const hours = date.getHours();
+            const minutes = date.getMinutes();
+            
+            // Only show labels for market open (9:30 AM) and close (4:00 PM)
+            if ((hours === 9 && minutes === 30) || (hours === 16 && minutes === 0)) {
+                return date.toLocaleTimeString([], { 
+                    hour: '2-digit', 
+                    minute: '2-digit'
+                });
+            }
+            return ''; // Return empty string for other times
+        }
+        // For other timeframes, show the date
+        return new Date(dateTimeString).toLocaleDateString();
+    };
 
     const chartData = Object.entries(timeSeriesData)
         .reverse()
-        .map(([date, data]) => {
+        .map(([dateTime, data]) => {
             const price = parseFloat(data['4. close']);
             const percentChange = ((price - currentPrice) / currentPrice * 100).toFixed(2);
             
             return {
-                date: new Date(date).toLocaleDateString(),
+                dateTime: dateTime,
+                displayTime: formatDateTime(dateTime),
                 price: price.toFixed(2),
                 percentChange: percentChange,
                 volume: parseInt(data['5. volume'])
             };
         });
 
-    // Calculate min and max prices for Y axis
     const prices = chartData.map(item => parseFloat(item.price));
     const maxPrice = Math.max(...prices);
     const minPrice = Math.min(...prices);
@@ -44,13 +64,17 @@ const PriceChart = ({ marketData, selectedFunction }) => {
     const yAxisMax = maxPrice + yAxisPadding;
     const yAxisMin = Math.max(0, minPrice - yAxisPadding);
 
-    // Custom tooltip content
     const CustomTooltip = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
             const isPositive = parseFloat(payload[1].payload.percentChange) >= 0;
             return (
                 <div className={style.customTooltip}>
-                    <p className={style.tooltipDate}>{label}</p>
+                    <p className={style.tooltipDate}>
+                        {selectedFunction === 'TIME_SERIES_INTRADAY' 
+                            ? new Date(payload[1].payload.dateTime).toLocaleString() // Show full date and time for intraday
+                            : label
+                        }
+                    </p>
                     <p className={style.tooltipPrice}>
                         Price: ${payload[1].value}
                         <span style={{ 
@@ -75,11 +99,17 @@ const PriceChart = ({ marketData, selectedFunction }) => {
                 <ResponsiveContainer width="100%" height={400}>
                     <ComposedChart data={chartData}>
                         <XAxis 
-                            dataKey="date" 
-                            tick={{ fill: '#adadad', fontSize: 12 }}
+                            dataKey="displayTime"
+                            tick={{ 
+                                fill: '#adadad', 
+                                fontSize: 12 
+                            }}
                             axisLine={{ stroke: '#454545' }}
                             tickLine={{ stroke: '#454545' }}
-                            interval={Math.ceil(chartData.length / 10)}
+                            interval={selectedFunction === 'TIME_SERIES_INTRADAY' 
+                                ? 'preserveStartEnd'  // For intraday, show open and close
+                                : Math.ceil(chartData.length / 10)  // For other time series, keep existing interval
+                            }
                             angle={-45}
                             textAnchor="end"
                             height={50}
@@ -96,10 +126,21 @@ const PriceChart = ({ marketData, selectedFunction }) => {
                         <YAxis 
                             yAxisId="volume"
                             orientation="right"
-                            tick={{ fill: '#adadad' }}
+                            tick={{ 
+                                fill: '#adadad',
+                                fontSize: 12,
+                                angle: -45
+                            }}
                             axisLine={{ stroke: '#454545' }}
                             tickLine={{ stroke: '#454545' }}
-                            tickFormatter={(value) => value.toLocaleString()}
+                            tickFormatter={(value) => {
+                                if (value >= 1000000) {
+                                    return `${(value / 1000000).toFixed(1)}M`;
+                                } else if (value >= 1000) {
+                                    return `${(value / 1000).toFixed(1)}K`;
+                                }
+                                return value;
+                            }}
                             width={80}
                         />
                         <Tooltip content={<CustomTooltip />} />
@@ -346,6 +387,7 @@ const StockStats = ({ marketData, selectedFunction, showFullData }) => {
     
     // Handle time series data
     const timeSeriesKey = {
+        'TIME_SERIES_INTRADAY': 'Time Series (5min)',
         'TIME_SERIES_DAILY': 'Time Series (Daily)',
         'TIME_SERIES_WEEKLY': 'Weekly Time Series',
         'TIME_SERIES_MONTHLY': 'Monthly Time Series'
@@ -483,7 +525,8 @@ const StockPriceSummary = ({ marketData }) => {
         change = parseFloat(marketData['Global Quote']['09. change']).toFixed(2);
         changePercent = parseFloat(marketData['Global Quote']['10. change percent'].replace('%', '')).toFixed(2) + '%';
     } else {
-        const timeSeriesData = marketData['Time Series (Daily)'] || 
+        const timeSeriesData = marketData['Time Series (5min)'] ||
+                             marketData['Time Series (Daily)'] || 
                              marketData['Weekly Time Series'] || 
                              marketData['Monthly Time Series'];
         if (timeSeriesData) {
@@ -647,6 +690,13 @@ const Stock = () => {
     
                             <div className={style.functionBar}>
                                 <div className={style.functionButtons}>
+                                    <button 
+                                        className={`${style.functionButton} ${selectedFunction === 'TIME_SERIES_INTRADAY' ? style.active : ''}`}
+                                        onClick={() => handleFunctionChange('TIME_SERIES_INTRADAY')}
+                                        disabled={isLoading}
+                                    >
+                                        Intraday
+                                    </button>
                                     <button 
                                         className={`${style.functionButton} ${selectedFunction === 'TIME_SERIES_DAILY' ? style.active : ''}`}
                                         onClick={() => handleFunctionChange('TIME_SERIES_DAILY')}

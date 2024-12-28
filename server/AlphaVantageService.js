@@ -26,7 +26,6 @@ const apiClient = axios.create({
 // Helper function to delay execution
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// Function to fetch stock data with retries
 const getStockData = async (symbol, functionType = 'TIME_SERIES_DAILY') => {
   let lastError = null;
   
@@ -34,15 +33,21 @@ const getStockData = async (symbol, functionType = 'TIME_SERIES_DAILY') => {
     try {
       console.log(`Attempt ${attempt}: Fetching ${functionType} data for ${symbol}`);
       
-      const response = await apiClient.get('', {
-        params: {
-          function: functionType,
-          symbol: symbol,
-          apikey: API_KEY
-        }
-      });
+      // Add params object to handle intraday interval
+      const params = {
+        function: functionType,
+        symbol: symbol,
+        apikey: API_KEY
+      };
 
-      // Log rate limit information if available
+      // Add interval parameter for intraday
+      if (functionType === 'TIME_SERIES_INTRADAY') {
+        params.interval = '5min';
+      }
+      
+      const response = await apiClient.get('', { params });
+
+      // Rest of your existing error handling and response processing
       const rateLimitLimit = response.headers['x-ratelimit-limit'];
       const rateLimitRemaining = response.headers['x-ratelimit-remaining'];
       if (rateLimitLimit && rateLimitRemaining) {
@@ -109,6 +114,7 @@ const getStockData = async (symbol, functionType = 'TIME_SERIES_DAILY') => {
 // Helper function to get the correct time series key based on function type
 const getTimeSeriesKey = (functionType) => {
   const keyMap = {
+    'TIME_SERIES_INTRADAY': 'Time Series (5min)',
     'TIME_SERIES_DAILY': 'Time Series (Daily)',
     'TIME_SERIES_WEEKLY': 'Weekly Time Series',
     'TIME_SERIES_MONTHLY': 'Monthly Time Series',

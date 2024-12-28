@@ -37,16 +37,15 @@ app.use(express.static('public'));
 // this is working
 app.get('/stock/:symbol', async (req, res) => {
   const symbol = req.params.symbol;
-  const functionType = req.query.function || 'TIME_SERIES_DAILY';
+  let functionType = req.query.function || 'TIME_SERIES_DAILY';
 
   try {
     console.log(`Processing request for ${symbol} with function type ${functionType}`);
     
-    // Fetch both overview and requested data concurrently
     try {
       const [overviewData, marketData] = await Promise.all([
         fetchStockData(symbol, 'OVERVIEW'),  // Always fetch overview
-        fetchStockData(symbol, functionType) // Fetch requested market data
+        fetchStockData(symbol, functionType) // The service will handle intraday params internally
       ]);
 
       console.log('Overview data received:', !!overviewData);
