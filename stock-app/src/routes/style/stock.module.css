@@ -2,7 +2,7 @@
     padding: 2px;
     border-top: 1px solid #454545;
     background-color: #18191a;
-    color: #adadad;
+    color: #fff;
 }
 
 .stockMainContent {
@@ -19,10 +19,6 @@
 /* Header section styles */
 .headerSection {
     margin-bottom: 12px;
-}
-
-.stockNameBlock {
-    margin-bottom: 24px;
 }
 
 /* Function Bar Styles */
@@ -49,7 +45,7 @@
     padding: 10px;
     background: none;
     border: none;
-    color: #adadad;
+    color: #fff;
     cursor: pointer;
     font-size: 14px;
     transition: color 0.2s;
@@ -82,7 +78,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 8px 12px;
-    color: #adadad;
+    color: #fff;
 }
 
 .switch {
@@ -121,7 +117,7 @@
     left: 2px;
     top: 50%;
     transform: translateY(-50%);
-    background-color: #adadad;
+    background-color: #fff;
     transition: .2s;
     border-radius: 50%;
     z-index: 1; /* Ensure the circle stays on top of the text */
@@ -132,7 +128,7 @@
     right: 5px;
     top: 50%;
     transform: translateY(-50%);
-    color: #adadad;
+    color: #fff;
     font-size: 10px;
 }
 
@@ -153,7 +149,7 @@
 }
 
 .switch:hover .slider:before {
-    background-color: white;
+    background-color: #198bd2;
 }
 
 .switch input:disabled + .slider {
@@ -165,7 +161,7 @@
     padding: 10px 24px;
     background: none;
     border: none;
-    color: #adadad;
+    color: #fff;
     cursor: pointer;
     font-size: 14px;
     position: relative;
@@ -173,7 +169,7 @@
 }
 
 .functionButton:hover {
-    color: #ffffff;
+    color: #198bd2;
 }
 
 .functionButton.active {
@@ -197,6 +193,7 @@
 
 .stockPriceSummaryBox {
     border: 1px solid #454545;
+    background-color: #18191a;
     border-radius: 2px;
     padding: 8px;
 }
@@ -252,6 +249,7 @@
     padding: 16px;
     width: 100%;
     margin-top: 20px;
+    background-color: #1e1f20;
 }
 
 .stockStatsBox table {
@@ -262,10 +260,6 @@
 .stockStatsBox tr {
     border-bottom: 1px solid #454545;
 }
-
-/* .stockStatsBox tr td:last-child {
-    text-align: right;
-} */
 
 .stockStatsBox td:first-child {
     text-align: left; /* Only the first column stays left-aligned */
@@ -280,13 +274,9 @@
 .stockStatsBox thead th {
     padding: 8px 4px;
     border-bottom: 2px solid #454545;
-    color: #adadad;
+    color: #fff;
     text-align: right; /* Set all headers to right align by default */
 }
-
-/* .stockStatsBox thead th:not(:first-child) {
-    text-align: right;
-} */
 
 .stockStatsBox thead th:first-child {
     text-align: left; /* Only the first header stays left-aligned */
@@ -318,7 +308,7 @@
 
 .column table tr {
     height: 20%;
-    border-bottom: 1px solid #454545;
+    border-bottom: 1px solid #fff;
 }
 
 .column td {
@@ -365,21 +355,6 @@
     }
 }
 
-.descriptionBox {
-    margin-bottom: 20px;
-    padding: 12px 16px;
-    border: 1px solid #454545;
-    border-radius: 2px;
-    background-color: #1e1f20;
-}
-
-.descriptionBox p {
-    color: #adadad;
-    line-height: 1.6;
-    margin: 0;
-    font-size: 14px;
-}
-
 .stockNameBlock {
     margin-bottom: 24px;
 }
@@ -388,7 +363,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    color: #adadad;
+    color: #fff;
 }
 
 .separator {
@@ -414,27 +389,6 @@
     font-size: 14px;
 }
 
-.newsSection {
-    margin-top: 24px;
-    margin-bottom: 24px;
-}
-
-/* The sectionTitle class is already defined in our previous styles */
-/* Just in case, here it is again to ensure consistency:
-.sectionTitle {
-    color: #198bd2;
-    font-size: 20px;
-    margin: 0;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #454545;
-    margin-bottom: 16px;
-}
-*/
-
-.newsContent {
-    min-height: 200px; /* Optional: gives some space for future content */
-}
-
 .sentimentSection {
     margin-top: 24px;
     margin-bottom: 24px;
@@ -442,7 +396,8 @@
 
 .sentimentChart {
     background-color: #1e1f20;
-    border-radius: 4px;
+    border: 1px solid #454545;
+    border-radius: 2px;
     padding: 16px;
     margin-top: 16px;
 }
@@ -452,21 +407,12 @@
     align-items: center;
     gap: 8px;
     margin-bottom: 16px;
-    color: #adadad;
+    color: #fff;
 }
 
 .priceValue {
     color: #198bd2;
     font-weight: 600;
-}
-
-.companyLink {
-    color: #198bd2;
-    text-decoration: none;
-}
-
-.companyLink:hover {
-    text-decoration: underline;
 }
 
 .industryDetails {

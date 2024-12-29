@@ -6,6 +6,17 @@ import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, ComposedChart, Line } from 'recharts';
 
+/**
+ * Stock chart component. creates a visual representation of data recieved by alphavantage 
+ * Time series function. X-axis representing the time/day/week/month of a price of a stock
+ * in history, with dashed lines (axis line, tick line) representing important dates.
+ * Left Y-axis represents cost of one share, with a tick line at an important value. Right
+ * Y-axis represents volume. Bar graph represents volume, line chart represents cost of one share.
+ * 
+ * @param {*} marketData Json AlphaVantage stock market data
+ * @param {*} selectedFunction Function sent to AlphaVantage
+ * @returns 
+ */
 const PriceChart = ({ marketData, selectedFunction }) => {
     if (!marketData) return null;
 
@@ -22,6 +33,12 @@ const PriceChart = ({ marketData, selectedFunction }) => {
     // Get current price for percentage calculations
     const currentPrice = parseFloat(Object.values(timeSeriesData)[0]['4. close']);
 
+    /**
+     * Formats the date and time into a 2 digit string.
+     * 
+     * @param {dateTimeString} a String represen
+     * @returns 
+     */
     const formatDateTime = (dateTimeString) => {
         if (selectedFunction === 'TIME_SERIES_INTRADAY') {
             const date = new Date(dateTimeString);
@@ -41,6 +58,9 @@ const PriceChart = ({ marketData, selectedFunction }) => {
         return new Date(dateTimeString).toLocaleDateString();
     };
 
+    /**
+     * 
+     */
     const chartData = Object.entries(timeSeriesData)
         .reverse()
         .map(([dateTime, data]) => {
@@ -54,7 +74,8 @@ const PriceChart = ({ marketData, selectedFunction }) => {
                 percentChange: percentChange,
                 volume: parseInt(data['5. volume'])
             };
-        });
+        }
+    );
 
     const prices = chartData.map(item => parseFloat(item.price));
     const maxPrice = Math.max(...prices);
@@ -101,14 +122,14 @@ const PriceChart = ({ marketData, selectedFunction }) => {
                         <XAxis 
                             dataKey="displayTime"
                             tick={{ 
-                                fill: '#adadad', 
+                                fill: '#fff', 
                                 fontSize: 12 
                             }}
                             axisLine={{ stroke: '#454545' }}
                             tickLine={{ stroke: '#454545' }}
                             interval={selectedFunction === 'TIME_SERIES_INTRADAY' 
-                                ? 'preserveStartEnd'  // For intraday, show open and close
-                                : Math.ceil(chartData.length / 10)  // For other time series, keep existing interval
+                                ? 'preserveStartEnd'
+                                : Math.ceil(chartData.length / 10)
                             }
                             angle={-45}
                             textAnchor="end"
@@ -117,7 +138,7 @@ const PriceChart = ({ marketData, selectedFunction }) => {
                         <YAxis 
                             yAxisId="price"
                             domain={[yAxisMin, yAxisMax]}
-                            tick={{ fill: '#adadad' }}
+                            tick={{ fill: '#fff' }}
                             axisLine={{ stroke: '#454545' }}
                             tickLine={{ stroke: '#454545' }}
                             tickFormatter={(value) => `$${Math.round(value)}`}
@@ -127,9 +148,9 @@ const PriceChart = ({ marketData, selectedFunction }) => {
                             yAxisId="volume"
                             orientation="right"
                             tick={{ 
-                                fill: '#adadad',
-                                fontSize: 12,
-                                angle: -45
+                                fill: '#fff',
+                                fontSize: 16,
+                                angle: 25
                             }}
                             axisLine={{ stroke: '#454545' }}
                             tickLine={{ stroke: '#454545' }}
@@ -269,22 +290,22 @@ const AnalystSentiment = ({ overviewData }) => {
                         <CartesianGrid strokeDasharray="3 3" stroke="#454545" vertical={false} />
                         <XAxis 
                             dataKey="sentiment" 
-                            tick={{ fill: '#adadad' }}
+                            tick={{ fill: '#fff' }}
                             axisLine={{ stroke: '#454545' }}
                         />
                         <YAxis 
-                            tick={{ fill: '#adadad' }}
+                            tick={{ fill: '#fff' }}
                             axisLine={{ stroke: '#454545' }}
                             domain={[0, 'dataMax']}
                         />
                         <Tooltip
                             contentStyle={{
                                 backgroundColor: '#1e1f20',
-                                border: '1px solid #454545',
+                                border: '1px solid #adadad',
                                 borderRadius: '4px'
                             }}
-                            labelStyle={{ color: '#adadad' }}
-                            itemStyle={{ color: '#adadad' }}
+                            labelStyle={{ color: '#fff' }}
+                            itemStyle={{ color: '#fff' }}
                         />
                         <Bar 
                             dataKey="count"
@@ -296,17 +317,6 @@ const AnalystSentiment = ({ overviewData }) => {
                         </Bar>
                     </BarChart>
                 </ResponsiveContainer>
-            </div>
-        </div>
-    );
-};
-
-const NewsSection = ({ overviewData }) => {
-    return (
-        <div className={style.newsSection}>
-            <h2 className={style.sectionTitle}>News</h2>
-            <div className={style.newsContent}>
-                {/* Future news content will go here */}
             </div>
         </div>
     );
@@ -519,18 +529,24 @@ const StockPriceSummary = ({ marketData }) => {
     let price = 'N/A';
     let change = '0';
     let changePercent = '0%';
+    let latestDate = null;
+    let isIntraday = false;
 
     if (marketData['Global Quote']) {
         price = parseFloat(marketData['Global Quote']['05. price']).toFixed(2);
         change = parseFloat(marketData['Global Quote']['09. change']).toFixed(2);
         changePercent = parseFloat(marketData['Global Quote']['10. change percent'].replace('%', '')).toFixed(2) + '%';
+        latestDate = marketData['Global Quote']['07. latest trading day'];
     } else {
         const timeSeriesData = marketData['Time Series (5min)'] ||
                              marketData['Time Series (Daily)'] || 
                              marketData['Weekly Time Series'] || 
                              marketData['Monthly Time Series'];
+        
+        isIntraday = !!marketData['Time Series (5min)'];
+        
         if (timeSeriesData) {
-            const latestDate = Object.keys(timeSeriesData)[0];
+            latestDate = Object.keys(timeSeriesData)[0];
             const latestData = timeSeriesData[latestDate];
             price = latestData['4. close'];
             const prevDate = Object.keys(timeSeriesData)[1];
@@ -543,10 +559,17 @@ const StockPriceSummary = ({ marketData }) => {
     }
 
     const isPositiveChange = parseFloat(change) >= 0;
+    
+    // Format the date based on whether it's intraday or not
+    const formattedDate = latestDate ? (
+        isIntraday 
+            ? new Date(latestDate).toLocaleString()
+            : new Date(latestDate).toLocaleDateString()
+    ) : 'N/A';
 
     return (
         <div className={style.stockPriceSummaryBox}>
-            <div>{new Date().toLocaleDateString()}</div>
+            <div style={{ color: '#adadad' }}>{formattedDate} previous market close </div>
             <div className={style.stockSummaryWrap}>
                 <div className={style.stockSummaryHead}>
                     ${parseFloat(price).toFixed(2)}
@@ -770,7 +793,6 @@ const Stock = () => {
                                     <FinancialMetrics overviewData={overviewData} />
                                     <StockDescription overviewData={overviewData} />
                                     <AnalystSentiment overviewData={overviewData} />
-                                    <NewsSection overviewData={overviewData} />
                                 </>
                             )}
                         </>
