@@ -37,12 +37,12 @@ const Home = () => {
 
 const MainHeader = () => {
     const headText = appName;
-    const headSubtext = "SEE WHAT'S MOVING THE MARKET";
+    const headSubtext = "TECH STARTUP CLUB AT UNIVERSITY OF WASHINGTON";
     const bgUrl = "https://wallpapers.com/images/featured/stock-market-pd5zksxr07t7a4xu.jpg";
     const bgGradient = "true";
-    const btnText = "GET STARTED";
-    const btnHref = "https://i.gifer.com/origin/7a/7a47d1014b0ac74e8db76bb7e2253e01_w200.gif";
-
+    const btnText = "Login";
+    const btnClass = "header-button";
+    const btnHref = "/login";
     return (
         <BigHeader
             headText={headText}
@@ -51,6 +51,7 @@ const MainHeader = () => {
             bgGradient={bgGradient}
             btnText={btnText}
             btnHref={btnHref}
+            btnClass={btnClass}
         />
     );
 }
@@ -83,7 +84,7 @@ const AboutBlerb = () => {
                 At Universal Wealth, we aim to connect users with the latest
                 stock market moves and news in a simple to use interface. This 
                 app formed as part of a project by the Tech Startup Club 
-                at the University of Washington Tacoma.
+                at the University of Washington.
             </p>
         </section>
     );

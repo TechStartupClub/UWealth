@@ -32,3 +32,27 @@
     color:#18191A;
     font-size: 16px;
 }
+
+.header-button {
+    display: inline-block;
+    text-align: center;
+    color: black !important;
+    background-color: #198bd2;
+    border: 2px solid black;
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0s ease;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+.header-button:hover {
+    background-color: white;
+    transform: scale(1.05);
+}
+
+.header-button:active {
+    transform: scale(0.95);
+}

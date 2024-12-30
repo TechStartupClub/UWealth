@@ -18,7 +18,7 @@ const Footer = () => {
                     Copyright &#169; 2024 {appName}. Data courtesy of Alpha Vantage.
                     <br />
                     Universal Wealth is a project of The Tech Startup Club at
-                    the University of Washington Tacoma.
+                    the University of Washington.
                     <br />
                     Project code available under the MIT license
                     on <a
