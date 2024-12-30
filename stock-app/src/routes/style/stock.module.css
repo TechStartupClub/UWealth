@@ -526,3 +526,28 @@ h1 .companyLink {
     color: #adadad;
     margin: 0;
 }
+
+.customBrush {
+    margin-top: 20px;
+}
+
+:global(.recharts-brush-slide) {
+    fill: #198bd2;
+    fill-opacity: 0.1;
+    stroke: none;
+}
+
+:global(.recharts-brush-traveller) {
+    fill: #18191A;
+    stroke: #454545;
+}
+
+:global(.recharts-brush-traveller rect) {
+    stroke-width: 1;
+}
+
+/* Style the brush texts */
+:global(.recharts-brush-texts) {
+    fill: #e4e6eb;
+    font-size: 12px;
+}

@@ -28,7 +28,6 @@ const Home = () => {
         <>
             <NavBar />
             <MainHeader />
-            <NewsAndStats />
             <AboutBlerb />
             <Footer />
         </>
@@ -37,7 +36,7 @@ const Home = () => {
 
 const MainHeader = () => {
     const headText = appName;
-    const headSubtext = "TECH STARTUP CLUB AT UNIVERSITY OF WASHINGTON";
+    const headSubtext = "A historical screener in your browser for free.";
     const bgUrl = "https://wallpapers.com/images/featured/stock-market-pd5zksxr07t7a4xu.jpg";
     const bgGradient = "true";
     const btnText = "Login";
@@ -53,26 +52,6 @@ const MainHeader = () => {
             btnHref={btnHref}
             btnClass={btnClass}
         />
-    );
-}
-
-const NewsAndStats = () => {
-    return (
-        <section className={style.newsStatsSectionWrap}>
-            <div className={style.newsStatsContainer}>
-
-                <div className={style.newsWrap}>
-                    <h2 className={style.head}>Market News</h2>
-                    
-                </div>
-
-                <div className={style.glWrap}>
-                    <h2 className={style.head}>Top Gain/Loss</h2>
-                    <GLPanel />
-                </div>
-
-            </div>
-        </section>
     );
 }
 

@@ -4,7 +4,7 @@ import axios from 'axios';
 import style from './style/stock.module.css';
 import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, ComposedChart, Line } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, ComposedChart, Line, Brush} from 'recharts';
 
 /**
  * Stock chart component. creates a visual representation of data recieved by alphavantage 
@@ -179,6 +179,17 @@ const PriceChart = ({ marketData, selectedFunction }) => {
                             yAxisId="price"
                             dot={false}
                             strokeWidth={2}
+                        />
+                        <Brush
+                            dataKey="dateTime"
+                            height={20}       // Made thinner
+                            stroke="#198bd2"
+                            fill="#18191A" 
+                            travellerWidth={8}  // Made handles slightly thinner
+                            startIndex={Math.max(0, chartData.length - 50)}
+                            className={style.customBrush}
+                            y={380}
+                            tickFormatter={() => ''} // Remove the date labels
                         />
                     </ComposedChart>
                 </ResponsiveContainer>
