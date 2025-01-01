@@ -29,3 +29,122 @@
 .header-button:active {
     transform: scale(0.95);
 }
+
+.socialBar {
+    background-color: #18191A;
+    padding: 15px 3%;  /* Match navbar padding */
+    width: 100%;
+}
+
+.socialBarContent {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.socialSection {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.socialText {
+    color: #e4e6eb;
+    font-size: 14px;
+}
+
+.socialLinks {
+    display: flex;
+    gap: 20px;
+}
+
+.socialLinks a {
+    color: #e4e6eb;
+    font-size: 20px;
+    transition: color 0.2s ease;
+}
+
+.socialLinks a:hover {
+    color: #198bd2;
+}
+
+.projectInfo {
+    color: #e4e6eb;
+    font-size: 14px;
+}
+
+@media screen and (max-width: 780px) {
+    .socialBarContent {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .socialSection {
+        margin-bottom: 10px;
+    }
+}
+
+.graphicHeader {
+    height: 90vh;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+ }
+
+ .graphicHeader2 {
+    background-position: -50px center;
+ }
+ 
+ .headerContent {
+    width: 75%; 
+    margin: 0; 
+    padding: 0; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-left: calc(1% + 5vw);  /* Responsive movement */
+    max-width: 75%;
+}
+
+.headerContent h2 {
+    line-height: 0.5;
+    font-size: 1.6rem;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.headerContent p {
+    font-size: 1.0rem;
+    opacity: 0.9;
+    line-height: 0.5;
+    text-align: left;
+}
+
+.headerContentRight {
+    width: 75%; 
+    margin: 0; 
+    padding: 0; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-right: calc(1% + 5vw);  /* Responsive movement */
+    max-width: 75%;
+}
+
+.headerContentRight h2 {
+    line-height: 0.5;
+    font-size: 1.6rem;
+    margin-bottom: 20px;
+    text-align: right;
+}
+
+.headerContentRight p {
+    font-size: 1.0rem;
+    opacity: 0.9;
+    line-height: 0.5;
+    text-align: right;
+}
