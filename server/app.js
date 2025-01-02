@@ -35,26 +35,52 @@ app.use(express.static('public'));
 
 // this is working
 app.get('/stock/:symbol', async (req, res) => {
-  console.log('inside the get stock symbol route');
-  const symbol = req.params.symbol; // Get the stock symbol from the request URL
+  const symbol = req.params.symbol;
+  let functionType = req.query.function || 'TIME_SERIES_DAILY';
+
   try {
-    console.log('');
-    const stockData = await getStockData(symbol)
-    // respond not responding
-    res.json(stockData);  // Send the data as JSON
+    console.log(`Processing request for ${symbol} with function type ${functionType}`);
+    
+    try {
+      const [overviewData, marketData] = await Promise.all([
+        fetchStockData(symbol, 'OVERVIEW'),  // Always fetch overview
+        fetchStockData(symbol, functionType) // The service will handle intraday params internally
+      ]);
+
+      console.log('Overview data received:', !!overviewData);
+      console.log('Market data received:', !!marketData);
+
+      // Combine the data into a single response
+      const combinedData = {
+        overview: overviewData,
+        market_data: marketData
+      };
+
+      res.json(combinedData);
+    } catch (error) {
+      console.error('Error in Promise.all:', error);
+      throw error;
+    }
   } catch (error) {
-    res.status(500).send('Error fetching stock data');
+    console.error('Error in stock route:', error);
+    
+    // Handle specific error cases
+    if (error.message.includes('Invalid API key')) {
+      return res.status(401).json({ error: 'Authentication failed' });
+    }
+    if (error.message.includes('Invalid request parameters')) {
+      return res.status(400).json({ error: 'Invalid request parameters' });
+    }
+    if (error.message.includes('API Rate Limit')) {
+      return res.status(429).json({ error: 'Rate limit exceeded. Please try again later.' });
+    }
+    
+    // Generic error response
+    res.status(500).json({ 
+      error: 'Error fetching stock data',
+      message: error.message 
+    });
   }
-});
-
-/** About route */
-app.get('/about', (req, res) => {
-  res.render('about', { title: 'About Us' });
-});
-
-/** Contact route */
-app.get('/contact', (req, res) => {
-  res.render('contact', { title: 'Contact Us' });
 });
 
 /** Auth routes */
