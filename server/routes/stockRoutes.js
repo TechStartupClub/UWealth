@@ -1,12 +1,10 @@
 const express = require('express');
-const app = express();
-const { getStockData } = require('../controllers/AlphaVantageService'); // import the service function
+const router = express.Router();
+const { fetchStockData } = require('../controllers/AlphaVantageService');
 const { getWatchlist, addToWatchlist, deleteFromWatchlist } = require('../controllers/watchlist');
 
-const router = express.Router();
-
-// Define the /stock/:symbol route
-app.get('/stock/:symbol', async (req, res) => {
+// Stock data route
+router.get('/:symbol', async (req, res) => {
   const symbol = req.params.symbol;
   let functionType = req.query.function || 'TIME_SERIES_DAILY';
 
@@ -55,7 +53,7 @@ app.get('/stock/:symbol', async (req, res) => {
   }
 });
 
-// Add a stock symbol to the watchlist
+// Watchlist routes
 router.post('/watchlist', async (req, res) => {
   try {
     const { userID, stockSymbol } = req.body;
@@ -71,7 +69,6 @@ router.post('/watchlist', async (req, res) => {
   }
 });
 
-// Delete a stock symbol from the watchlist
 router.delete('/watchlist', async (req, res) => {
   try {
     const { userID, stockSymbol } = req.body;
