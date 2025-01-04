@@ -1,9 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import AuthContext from '../../context/AuthProvider';  // Updated import path
 import logo from '../../assets/images/universal-wealth-logo-main.png';
 import "./index.css";
 
 const NavBar = () => {
+    const { auth } = useContext(AuthContext);  // This stays the same since your context object is still named AuthContext
     const [isOpen, setIsOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const navRef = useRef(null);
@@ -85,8 +87,10 @@ const NavBar = () => {
                     <Link className='link-style' to={'/crypto'}>Crypto</Link>
                     <Link className='link-style' to={'/about'}>About</Link>
                     <Link className='link-style' to={'/contact'}>Contact</Link>
-                    <Link className='link-style login-button' to={'/login'}>Login</Link>
-                    {/* <Link className='link-style' to={'/profile/:userId'}>Profile</Link> */}
+                    <Link className='link-style' to={'/UserProfile'}>Profile</Link>
+                    {!auth && (
+                        <Link className='link-style login-button' to={'/login'}>Login</Link>
+                    )}
                 </div>
             </div>
             <div id='burger' ref={burgerRef} onClick={toggleMenu}>

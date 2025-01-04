@@ -66,7 +66,7 @@ const SocialMediaBar = () => {
                 <div className={style.socialSection}>
                     <span className={style.socialText}>Follow us on</span>
                     <div className={style.socialLinks}>
-                        <a href="https://github.com/UWTechStartUpClub" target="_blank" rel="noopener noreferrer">
+                        <a href="https://github.com/TechStartupClub" target="_blank" rel="noopener noreferrer">
                             <i className="fab fa-github"></i>
                         </a>
                         <a href="https://www.linkedin.com/company/techstartupclub/" target="_blank" rel="noopener noreferrer">
